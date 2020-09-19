@@ -15,22 +15,22 @@ s2=0;
 s3=0;
 for i=1:N
     for j=1:N
-            
-Rij=(y(3*i-2)-y(3*j-2))^2+(y(3*i-1)-y(3*j-1))^2+(y(3*i)-y(3*j))^2;
-            %compute the three components of acceleration i
-            if j~=i
-               s1=s1+(Mass(1,j)/(sqrt(Rij))^3)*(y(3*j-2)-y(3*i-2));
-               s2=s2+(Mass(1,j)/(sqrt(Rij))^3)*(y(3*j-1)-y(3*i-1));
-               s3=s3+(Mass(1,j)/(sqrt(Rij))^3)*(y(3*j)-y(3*i));
-            else
-               s1=s1+0;
-               s2=s2+0;
-               s3=s3+0;
-            end
+        Rij=(y(3*i-2)-y(3*j-2))^2+(y(3*i-1)-y(3*j-1))^2+(y(3*i)-y(3*j))^2;
+        %compute the three components of acceleration i
+        if j~=i
+           s1=s1+(Mass(1,j)/(sqrt(Rij))^3)*(y(3*j-2)-y(3*i-2));
+           s2=s2+(Mass(1,j)/(sqrt(Rij))^3)*(y(3*j-1)-y(3*i-1));
+           s3=s3+(Mass(1,j)/(sqrt(Rij))^3)*(y(3*j)-y(3*i));
+        else
+           s1=s1+0;
+           s2=s2+0;
+           s3=s3+0;
+        end
     end
     acc(3*i-2)=G*s1;
     acc(3*i-1)=G*s2;
     acc(3*i)=G*s3;
+    acc(isnan(acc))=0;
     s1=0;
     s2=0;
     s3=0;
