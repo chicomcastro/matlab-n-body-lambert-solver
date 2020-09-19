@@ -26,7 +26,7 @@ bv = zeros(1,N)*c;
 %% Earth-Sun system
 M_sun = 2e30;   % kg
 M_earth = 6e24; % kg
-um = M_sun + M_earth;
+um = M_sun + M_earth; % kg
 mu = M_earth/um;
 Mass(1) = 1 - mu;
 Mass(2) = mu;

@@ -8,7 +8,7 @@
 %scalar ODEs and expect matlab to bog down accordingly.
 
 N=2                   % number of bodies
-simulationTime=10     % How long to run the simulation
+simulationTime=100     % How long to run the simulation
 G=1                   % gravitational constant
 
 %The value of the gravitation constant in the metric system is
