@@ -1,0 +1,105 @@
+%% Set up initial conditions
+
+if ~exist("N", "var")
+    setUpParameters;
+end
+
+Mass=[1.0 1.0 1.0 1.0 1.0];  %their masses
+
+%NOTE:  The masses are currently all equal.  I the problem described in the
+%notes, the output of this program with the present masses is compaired to
+%the output when the value of the first mass is changed to 2.
+
+%Coordinates given in special system have to be converted to Rectangular.
+
+PI=3.1415926535898;
+c=PI/180;
+
+%Initial positions in r alpha and beta
+r0 = [1 1 1 1 1];
+r01=1.0;
+r02=1.0;
+r03=1.0;
+r04=1.0;
+r05=1.0;
+
+ar = [0 72 144 216 288]*c;
+ar1=0.0*c;
+ar2=72.0*c;
+ar3=144.0*c;
+ar4=216.0*c;
+ar5=288.0*c;
+
+br = [0 0 0 0 0]*c;
+br1=0.0;
+br2=0.0;
+br3=0.0;
+br4=0.0;
+br5=0.0;
+
+%initial velocities in v alpha and beta.
+
+v0 = 0.6*ones(1,5);
+v01=0.6;
+v02=0.6;
+v03=0.6;
+v04=0.6;
+v05=0.6;
+
+av = 90*ones(1,5)*c;
+av1=90.0*c;
+av2=90.0*c;
+av3=90.0*c;
+av4=90.0*c;
+av5=90.0*c;
+
+bv = zeros(1,5)*c;
+bv1=0.0;
+bv2=0.0;
+bv3=0.0;
+bv4=0.0;
+bv5=0.0;
+
+Rec=0;
+Rec_test = 0;
+%convert positions to cartesean frame
+
+for i=1:N
+    Rec_test(3*i-2:3*i,1) = [... %% TODO <<<<<<<
+        r0(i)*cos(ar(i))*cos(br(i));...
+        r0(i)*sin(ar(i))*cos(br(i));...
+        r0(i)*sin(br(i))...
+    ];
+end
+Rec(1:3,1)= [r01*cos(ar1)*cos(br1);r01*sin(ar1)*cos(br1);r01*sin(br1)];
+Rec(4:6,1)= [r02*cos(ar2)*cos(br2);r02*sin(ar2)*cos(br2);r02*sin(br2)];
+Rec(7:9,1)= [r03*cos(ar3)*cos(br3);r03*sin(ar3)*cos(br3);r03*sin(br3)];
+Rec(10:12,1)= [r04*cos(ar4)*cos(br4);r04*sin(ar4)*cos(br4);r04*sin(br4)];
+Rec(13:15,1)= [r05*cos(ar5)*cos(br5);r05*sin(ar5)*cos(br5);r05*sin(br5)];
+
+
+A=0;
+%convert spherical velocities to rst frame
+for i=1:N
+    A(3*i-2:3*i,1)=[...
+        v0(i)*cos(av(i))*cos(bv(i));...
+        v0(i)*sin(av(i))*cos(bv(i));...
+        v0(i)*sin(bv(i))...
+    ];
+    Rec_test(3*i-2 + 3*N:3*i + 3*N,1) = A(3*i-2:3*i,1)
+end
+A(1:3,1)=[v01*cos(av1)*cos(bv1);v01*sin(av1)*cos(bv1);v01*sin(bv1)];
+A(4:6,1)=[v02*cos(av2)*cos(bv2);v02*sin(av2)*cos(bv2);v02*sin(bv2)];
+A(7:9,1)=[v03*cos(av3)*cos(bv3);v01*sin(av3)*cos(bv3);v03*sin(bv3)];
+A(10:12,1)=[v04*cos(av4)*cos(bv4);v04*sin(av4)*cos(bv4);v04*sin(bv4)];
+A(13:15,1)=[v05*cos(av5)*cos(bv5);v05*sin(av5)*cos(bv5);v05*sin(bv5)];
+
+%convert rst velocities to ijk.  Each velociety has a different matrix.
+
+Rec(16:18,1)= rstTOijk(Rec(1:3,1))*A(1:3,1);
+Rec(19:21,1)= rstTOijk(Rec(4:6,1))*A(4:6,1);
+Rec(22:24,1)= rstTOijk(Rec(7:9,1))*A(7:9,1);
+Rec(25:27,1)= rstTOijk(Rec(10:12,1))*A(10:12,1);
+Rec(28:30,1)= rstTOijk(Rec(13:15,1))*A(13:15,1);
+
+y0 = Rec;
