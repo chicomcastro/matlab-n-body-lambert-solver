@@ -22,26 +22,38 @@ av = 90*ones(1,N)*c;
 bv = zeros(1,N)*c;
 
 
-%% Earth-Sun system
-% Setting two firsts bodies to be Sun and Earth
-M_sun = 2e30;   % kg
-M_earth = 6e24; % kg
+%% Earth-Sun-Spacechip system
+% Setting two firsts bodies to be Sun (red) and Earth (blue)
+M_sun = 1.989e30;   % kg
+M_earth = 5.972e24; % kg
 um = M_sun + M_earth; % kg
-mu = M_earth/um;
-Mass(1) = 1 - mu;
-Mass(2) = mu;
+Mass(1) = M_sun/um;
+Mass(2) = M_earth/um;
 
 UA = 1.496e11;  % m
 R_earth_sun = 1*UA;
 ud = UA;
 r0(1) = 0;
-r0(2) = 1;
+r0(2) = R_earth_sun/ud;
+ar(2) = 0;
 
-ut = (ud^3/G_metric/um)^(1/2);  % s
+ut = sqrt(G/G_metric)*sqrt(ud^3/um);  % s
 
 V_earth_sun = sqrt(G_metric*M_sun/R_earth_sun);
 v0(1) = 0;
 v0(2) = V_earth_sun/ud*ut;
+
+% Spaceship (green)
+Mass(3) = 200/um;
+r0(3) = r0(2) + 2000e3/ud;
+ar(3) = ar(2);
+R_mars_sun = 2.2794e11; % m
+semieixo = (R_mars_sun + R_earth_sun) / 2;
+if ~exist("V_earth_mars", "var")
+    V_earth_mars = sqrt(G_metric*M_sun*(1/semieixo+2/R_earth_sun));
+end
+v0(3) = (V_earth_mars)/ud*ut;
+av(3) = av(2);
 
 %% Frame transformation
 % Convert positions to cartesean frame

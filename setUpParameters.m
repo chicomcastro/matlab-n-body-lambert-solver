@@ -7,8 +7,12 @@
 %Remember that the system of ODEs is a 6*N system of first order
 %scalar ODEs and expect matlab to bog down accordingly.
 
+if ~exist("t_voo", "var")
+    t_voo = 2*pi;
+end
+
 N=3                   % number of bodies
-simulationTime=10     % How long to run the simulation
+simulationTime=t_voo     % How long to run the simulation
 G=1                   % gravitational constant
 
 %The value of the gravitation constant in the metric system is
