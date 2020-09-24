@@ -11,9 +11,9 @@ if ~exist("t_voo", "var")
     t_voo = 2*pi;
 end
 
-N=3                   % number of bodies
-simulationTime=t_voo     % How long to run the simulation
-G=1                   % gravitational constant
+N = 3;                      % number of bodies
+simulationTime = t_voo;     % How long to run the simulation
+G = 1;                      % gravitational constant
 
 %The value of the gravitation constant in the metric system is
 %

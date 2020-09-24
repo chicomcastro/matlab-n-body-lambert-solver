@@ -48,11 +48,11 @@ Mass(3) = 200/um;
 r0(3) = r0(2) + 2000e3/ud;
 ar(3) = ar(2);
 R_mars_sun = 2.2794e11; % m
-semieixo = (R_mars_sun + R_earth_sun) / 2;
 if ~exist("V_earth_mars", "var")
-    V_earth_mars = sqrt(G_metric*M_sun*(1/semieixo+2/R_earth_sun));
+    semieixo = (R_mars_sun + R_earth_sun) / 2;
+    V_earth_mars = sqrt(G_metric*M_sun*(1/semieixo+2/R_earth_sun))/1000; %km/s
 end
-v0(3) = (V_earth_mars)/ud*ut;
+v0(3) = (V_earth_mars*1000)/ud*ut;
 av(3) = av(2);
 
 %% Frame transformation

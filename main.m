@@ -13,7 +13,8 @@ setUpInitialConditions;
 runIntegration;
 
 %%
-calculateIntegralsOfMotion;
-
-%%
-doPlottings;
+global shouldPlot
+if shouldPlot == 1
+    calculateIntegralsOfMotion;
+    doPlottings;
+end
