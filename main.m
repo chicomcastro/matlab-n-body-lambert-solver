@@ -4,6 +4,7 @@
 %close all
 
 %%
+loadData;
 setUpParameters;
 
 %%

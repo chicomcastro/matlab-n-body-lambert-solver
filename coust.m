@@ -1,18 +1,19 @@
-function [posValue, vecValue] = coust(x)
-    t_voo = x(1);           % ut
-    V_earth_mars = x(2);    % km/s
+function result = coust(x)
+    t_voo = x.t_voo;           % ut
+    initial_pos = x.initial_pos;
+    V_exit_earth = x.v0;    % km/s
+    
     main;
-    scPos = y(:,7:9);
-    scVel = y(:,16:18); 
-    scPosRadial = vecnorm(scPos')';
-    distanceToMars = scPosRadial - R_mars_sun/ud;
     
-    h = cross(scPos, scVel);
-    v_versor = cross(h, scPos)./vecnorm(cross(h, scPos)')';
-    V_mars_sun = sqrt(G_metric*M_sun/R_mars_sun)*v_versor/ud*ut;
+    r = y(end,7:9);           % ud
+    v = y(end,16:18);         % ud/ut
     
-    posValue = abs(distanceToMars(end, :)); % UA
-    vecValue = norm(scVel(end, :) - V_mars_sun(end, :))*ud/ut/1000; % km/s
+    target = x.target_pos;        % ud
+    error = r(:) - target(:);
     
-    %value = posValue + vecValue;
+    result.error = error;
+    result.x_t1 = y(1,7:9)*ud;
+    result.v_t1 = y(1,16:18)*ud/ut;
+    result.x_t2 = r*ud;
+    result.v_t2 = v*ud/ut;
 end
