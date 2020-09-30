@@ -9,7 +9,7 @@ function result = coust(x)
     v = y(end,16:18);         % ud/ut
     
     target = x.target_pos;        % ud
-    error = r(:) - target(:);
+    error = r(:)' - target(:)';
     
     result.error = error;
     result.x_t1 = y(1,7:9)*ud;
