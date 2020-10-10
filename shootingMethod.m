@@ -25,7 +25,7 @@ initial_state.v0 = initial_velocity_guess;
 x = initial_state;
 %%
 itr = 1;
-delta = 1e-2; %10^(0.62);
+delta = 1e-2;
 error = [];
 erro_dist = ones(1,3)*ud;
 disp("Iniciando busca de uma solução...");
@@ -64,13 +64,8 @@ while norm(erro_dist)/ud > 5e-2
     erro_dist = result.error;                       % [m]
     delta_velocidade = -1*dXdV\erro_dist(:);        % [m/s]
     x.v0 = x.v0 + delta_velocidade(:)'/1000;        % [km/s]
-    
-    %error(end+1) = norm(erro_dist);
 end
 toc
 disp("Solução encontrada!");
 disp(x);
 disp("Custo de saída: " + abs(norm(x.v0) - V_oe_inertial));
-
-%disp("Convergence rate: " + ((error(1) - error(end)) / itr / ud));
-%disp("Min error: " + min(error)/ud);
