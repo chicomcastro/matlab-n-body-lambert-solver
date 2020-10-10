@@ -15,5 +15,3 @@ end
 
 %Integrate the System
 [t,y] = ode113('nBodyWpar',tspan,y0,options,flag,N,G,Mass);
-
-disp('Integration is done...');

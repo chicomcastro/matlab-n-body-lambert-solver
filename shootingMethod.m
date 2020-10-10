@@ -1,5 +1,4 @@
 clear;
-tic
 global shouldPlot;
 shouldPlot = 0;
 
@@ -9,12 +8,15 @@ V_oe_earth = sqrt(G_metric*M_earth/altitude_from_earth);     % [m/s]
 V_oe_inertial = V_oe_earth + V_earth_sun;
 V_oe_inertial = V_oe_inertial/1e3;  % to [km/s]
 
-t_voo = 2*pi;   % Tempo [rad]
-initial_velocity_guess = (V_oe_inertial + 8) * [0 1 0];  % km/s
+t_voo = 4.8200;   % Tempo [rad]
+semieixo = (R_mars_sun + R_earth_sun) / 2;
+V_exit_earth = sqrt(G_metric*M_sun*(1/semieixo+2/R_earth_sun))/1000*[0 1 0]; %km/s
+initial_velocity_guess = [36.5891 55.5695 0];  % km/s
 
 initial_pos = (R_earth_sun * [1 0 0] + altitude_from_earth * [1 0 0]);  % m
 target_pos = R_mars_sun * [-1 0 0]; % m
 
+%% Initial state struct
 initial_state.t_voo = t_voo;
 initial_state.initial_pos = initial_pos;
 initial_state.target_pos = target_pos;
@@ -23,30 +25,52 @@ initial_state.v0 = initial_velocity_guess;
 x = initial_state;
 %%
 itr = 1;
-while itr <= 1
-    disp("---");
-    disp("Iteração: " + itr);
+delta = 1e-2; %10^(0.62);
+error = [];
+erro_dist = ones(1,3)*ud;
+disp("Iniciando busca de uma solução...");
+tic
+while norm(erro_dist)/ud > 5e-2
+    if mod(itr, 10) == 0
+        disp("---");
+        disp("Iteração: " + itr);
+        disp("Error: " + norm(erro_dist)/ud);
+    end
     
     itr = itr + 1;
     x1 = x;
-    result1 = coust(x1);
-    x2 = x;
-    x2.v0 = x2.v0 + rand(1,3);
-    result2 = coust(x2);
+    result = coust(x1);
     
-    dx1 = result2.x_t2(1) - result1.x_t2(1);
-    dx2 = result2.x_t2(2) - result1.x_t2(2);
-    dx3 = result2.x_t2(3) - result1.x_t2(3);
-    dv1 = result2.v_t1(1) - result1.v_t1(1);
-    dv2 = result2.v_t1(2) - result1.v_t1(2);
-    dv3 = result2.v_t1(3) - result1.v_t1(3);
-    dXdV = [...
-        dx1/dv1 dx2/dv1 dx3/dv1; ...
-        dx1/dv2 dx2/dv2 dx3/dv2; ...
-        dx1/dv3 dx2/dv3 dx3/dv3; ...
-    ];
-    erro_dist = result1.error;
-    delta_velocidade = -1*inv(dXdV)*erro_dist(:);
-    x.v0 = x.v0 + delta_velocidade(:)'/1000;
+    % vx variation
+    xx = x;
+    xx.v0 = xx.v0 + delta*[1,0,0];
+    result_dx = coust(xx);
+    dxdvx = (result_dx.x_t2 - result.x_t2)/delta;
+    
+    % vy variation
+    xy = x;
+    xy.v0 = xy.v0 + delta*[0,1,0];
+    result_dy = coust(xy);
+    dxdvy = (result_dy.x_t2 - result.x_t2)/delta;
+    
+    % vz variation
+    xz = x;
+    xz.v0 = xz.v0 + delta*[0,0,1];
+    result_dz = coust(xz);
+    dxdvz = (result_dz.x_t2 - result.x_t2)/delta;
+    
+    % variation matrix
+    dXdV = [dxdvx; dxdvy; dxdvz]';                  % [s]
+    erro_dist = result.error;                       % [m]
+    delta_velocidade = -1*dXdV\erro_dist(:);        % [m/s]
+    x.v0 = x.v0 + delta_velocidade(:)'/1000;        % [km/s]
+    
+    %error(end+1) = norm(erro_dist);
 end
 toc
+disp("Solução encontrada!");
+disp(x);
+disp("Custo de saída: " + abs(norm(x.v0) - V_oe_inertial));
+
+%disp("Convergence rate: " + ((error(1) - error(end)) / itr / ud));
+%disp("Min error: " + min(error)/ud);

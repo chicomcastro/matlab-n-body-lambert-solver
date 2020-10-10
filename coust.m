@@ -9,11 +9,11 @@ function result = coust(x)
     v = y(end,16:18);         % ud/ut
     
     target = x.target_pos;        % ud
-    error = r(:)' - target(:)';
+    error = r(:)'*ud - target(:)';
     
-    result.error = error;
-    result.x_t1 = y(1,7:9)*ud;
-    result.v_t1 = y(1,16:18)*ud/ut;
-    result.x_t2 = r*ud;
-    result.v_t2 = v*ud/ut;
+    result.error = error;           % [m]
+    result.x_t1 = y(1,7:9)*ud;      % [m]
+    result.v_t1 = y(1,16:18)*ud/ut; % [m/s]
+    result.x_t2 = r*ud;             % [m]
+    result.v_t2 = v*ud/ut;          % [m/s]
 end
