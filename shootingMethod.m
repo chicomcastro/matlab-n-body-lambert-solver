@@ -1,29 +1,33 @@
+%% script shootingMethod
+% Performs shooting method to find a solution for orbit from given initial
+% conditions
+
 clear;
+
+% Do not change this (see showResults.m)
 global shouldPlot;
 shouldPlot = 0;
 
-%%
+%% Pré declarations and calculations
+% This is the section that can be security changed to fit your problem
+% Others section can cause problems to change, then it's your risk
 loadData;
-V_oe_earth = sqrt(G_metric*M_earth/altitude_from_earth);     % [m/s]
-V_oe_inertial = V_oe_earth + V_earth_sun;
-V_oe_inertial = V_oe_inertial/1e3;  % to [km/s]
 
-t_voo = 4.8200;   % Tempo [rad]
-semieixo = (R_mars_sun + R_earth_sun) / 2;
-V_exit_earth = sqrt(G_metric*M_sun*(1/semieixo+2/R_earth_sun))/1000*[0 1 0]; %km/s
-initial_velocity_guess = [36.5891 55.5695 0];  % km/s
+t_voo = 4.8200;   % Simulation time [rad]
+initial_velocity_guess = [36.5891 55.5695 0];	% [km/s]
 
-initial_pos = (R_earth_sun * [1 0 0] + altitude_from_earth * [1 0 0]);  % m
-target_pos = R_mars_sun * [-1 0 0]; % m
+initial_pos = (R_earth_sun * [1 0 0] + altitude_from_earth * [1 0 0]);	% [m]
+target_pos = R_mars_sun * [-1 0 0];     % [m]
 
 %% Initial state struct
-initial_state.t_voo = t_voo;
-initial_state.initial_pos = initial_pos;
-initial_state.target_pos = target_pos;
-initial_state.v0 = initial_velocity_guess;
+initial_state.t_voo = t_voo;                % [rad] (not [s], see normalization.m)
+initial_state.initial_pos = initial_pos;    % [m]
+initial_state.target_pos = target_pos;      % [m]
+initial_state.v0 = initial_velocity_guess;  % [km/s]
 
 x = initial_state;
-%%
+
+%% Main loop
 itr = 1;
 delta = 1e-2;
 error = [];
@@ -61,6 +65,8 @@ while norm(erro_dist)/ud > 5e-2
     
     % variation matrix
     dXdV = [dxdvx; dxdvy; dxdvz]';                  % [s]
+    
+    % velocity correction
     erro_dist = result.error;                       % [m]
     delta_velocidade = -1*dXdV\erro_dist(:);        % [m/s]
     x.v0 = x.v0 + delta_velocidade(:)'/1000;        % [km/s]

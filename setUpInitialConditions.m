@@ -27,6 +27,6 @@ r3 = initial_pos/ud;
 v3 = (V_exit_earth*1000)/ud*ut;
 
 %%
-% Atribute initial conditions vector
+% Sets initial conditions vector
 y0 = [r1, r2, r3, v1, v2, v3];
-y0 = y0(:);
+y0 = y0(:);     % [column vector]

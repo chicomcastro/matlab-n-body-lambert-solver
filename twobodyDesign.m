@@ -98,6 +98,7 @@ hold on
 plot(y(numSteps,1),y(numSteps,2),'r*',y(numSteps,4),y(numSteps,5),'b*')
 plot(y(1,1),y(1,2),'ro',y(1,4),y(1,5),'bo')
 plot(y(:,1),y(:,2), 'r',y(:,4),y(:,5), 'b')
+grid on
 
 
 
