@@ -33,7 +33,7 @@ V_oe_inertial = V_oe_inertial/1e3;                          % [km/s]
 
 % Hohmann transfer velocity from Earth to Mars
 semieixo = (R_mars_sun + R_earth_sun) / 2;
-V_exit_earth = sqrt(G_metric*M_sun*(1/semieixo+2/R_earth_sun))/1000*[0 1 0]; %km/s
+V_hohmann_earth_mars = sqrt(G_metric*M_sun*(1/semieixo+2/R_earth_sun))/1000*[0 1 0]; %km/s
 
 % Coordinates given in special system have to be converted to Rectangular.
 PI = 3.1415926535898;
