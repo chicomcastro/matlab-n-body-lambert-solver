@@ -43,24 +43,24 @@ while norm(erro_dist)/ud > 5e-2
     
     itr = itr + 1;
     x1 = x;
-    result = coust(x1);
+    result = simulate(x1);
     
     % vx variation
     xx = x;
     xx.v0 = xx.v0 + delta*[1,0,0];
-    result_dx = coust(xx);
+    result_dx = simulate(xx);
     dxdvx = (result_dx.x_t2 - result.x_t2)/delta;
     
     % vy variation
     xy = x;
     xy.v0 = xy.v0 + delta*[0,1,0];
-    result_dy = coust(xy);
+    result_dy = simulate(xy);
     dxdvy = (result_dy.x_t2 - result.x_t2)/delta;
     
     % vz variation
     xz = x;
     xz.v0 = xz.v0 + delta*[0,0,1];
-    result_dz = coust(xz);
+    result_dz = simulate(xz);
     dxdvz = (result_dz.x_t2 - result.x_t2)/delta;
     
     % variation matrix

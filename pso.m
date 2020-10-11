@@ -67,3 +67,37 @@ while ~check_stopping_condition(iteration, max_iteration)
         best_global = best_iteration;
     end
 end
+
+function value = coust(state)
+    
+    if state(1) == 0
+        value = Inf;
+        return;
+    end
+    
+    x.t_voo = state(1);
+    x.initial_pos = state(2:4);
+    x.target_pos = state(5:7);
+    x.v0 = state(8:10);
+    
+    result = simulate(x);
+    value = result.error;
+end
+
+function value = random_uniform(lb, ub)
+%random_uniform generates a pseudorandomic value in [lb, ub] range
+%   The value is taken from standard uniform distribution (rand())
+    for i = 1:length(lb)
+        value(i) = rand(1)*(ub(i)-lb(i))+lb(i);
+    end
+end
+
+function shouldStop = check_stopping_condition(iteration, max_iteration)
+%Check if a analysis should stop
+%   Passes max_iteration
+    if (iteration < max_iteration)
+        shouldStop = false;
+    else
+        shouldStop = true;
+    end
+end

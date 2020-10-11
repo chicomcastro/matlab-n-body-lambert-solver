@@ -1,4 +1,4 @@
-function result = coust(x)
+function result = simulate(x)
 % Run simulation for parameters passed on x argument and returns results
 % on result struct. Assumes the error on distance as error for the solvers
     t_voo = x.t_voo;           % ut
