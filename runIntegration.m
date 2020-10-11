@@ -15,15 +15,10 @@ if ~exist('options', 'var')
 end
 
 %Integrate the System
-[t,y] = ode113(@(t,y)nBodyWpar(t,y,options,flag,N,G,Mass),tspan,y0,options);
+[t,y,te,ye,ie] = ode113(@(t,y)nBodyWpar(t,y,options,flag,N,G,Mass),tspan,y0,options);
 
 function [value, isterminal, direction] = myEvent(t, y, tstart)
-    
-    value      = toc(tstart) < 1.0;
+    value      = toc(tstart) < 1.0;     % Set integration time limit to 1s
     isterminal = 1;   % Stop the integration
     direction  = 0;
-    
-    if value == 0
-        disp("Exiting ode113");
-    end
 end

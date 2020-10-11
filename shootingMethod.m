@@ -68,10 +68,17 @@ while norm(erro_dist)/ud > 5e-2
     
     % velocity correction
     erro_dist = result.error;                       % [m]
-    delta_velocidade = -1*dXdV\erro_dist(:);        % [m/s]
-    x.v0 = x.v0 + delta_velocidade(:)'/1000;        % [km/s]
+    if erro_dist < Inf
+        delta_velocidade = -1*dXdV\erro_dist(:);        % [m/s]
+        x.v0 = x.v0 + delta_velocidade(:)'/1000;        % [km/s]
+    else
+        disp("Bad initial conditions, giving up due to ode time limit (see runIntegration.m)");
+        break;
+    end
 end
 toc
-disp("Solução encontrada!");
-disp(x);
-disp("Custo de saída: " + abs(norm(x.v0) - V_oe_inertial));
+if erro_dist < Inf
+    disp("Solução encontrada!");
+    disp(x);
+    disp("Custo de saída: " + abs(norm(x.v0) - V_oe_inertial));
+end

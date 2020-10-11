@@ -14,7 +14,12 @@ function result = coust(x)
     target = x.target_pos;          % [ud]
     error = r(:)'*ud - target(:)';  % [m] [row vector]
     
-    result.error = error;           % [m]
+    if length(ie) > 0 && ie(end) == 1
+        result.error = Inf;         % Do not count if ode has limited time
+    else
+        result.error = error;       % [m]
+    end
+
     result.x_t1 = y(1,7:9)*ud;      % [m]
     result.v_t1 = y(1,16:18)*ud/ut; % [m/s]
     result.x_t2 = r*ud;             % [m]
