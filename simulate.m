@@ -1,9 +1,9 @@
 function result = simulate(x)
 % Run simulation for parameters passed on x argument and returns results
 % on result struct. Assumes the error on distance as error for the solvers
-    t_voo = x.t_voo;           % ut
-    initial_pos = x.initial_pos;
-    V_exit_earth = x.v0;    % km/s
+    t_voo = x.t_voo;                % [ut]
+    initial_pos = x.initial_pos;    % [m]
+    V_exit_earth = x.v0;            % [km/s]
     
     % Run all subroutines related to simulation
     main;

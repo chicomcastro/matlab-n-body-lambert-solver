@@ -1,9 +1,13 @@
 %% Inputs
 % Define optimization parameters
-max_iteration = 100;                                  % Iteractions to run
-num_particles = 100;                                  % Particles in swarm
+max_iteration = 1000;                                  % Iteractions to run
+num_particles = 1000;                                  % Particles in swarm
 
 clear lower_boundary upper_boundary
+
+% Do not change this (see showResults.m)
+global shouldPlot;
+shouldPlot = 0;
 
 %% Pré declarations and calculations
 % This is the section that can be security changed to fit your problem
@@ -25,12 +29,13 @@ lower_boundary.target_pos = target_pos;
 upper_boundary.target_pos = target_pos;
 
 % Variable values
-lower_boundary.v0 = [0, V_oe_earth + V_earth_sun / 2, 0];
-upper_boundary.v0 = ones(1,3)*V_oe_inertial;
+delta_v = [ 0 0.5 0];
+lower_boundary.v0 = [36.5891 55.5695 0]*0;
+upper_boundary.v0 = [36.5891 55.5695 0]*2;
 
 %%
-lower_boundary = struct_2_boundary(lower_boundary); % Lower boundary
-upper_boundary = struct_2_boundary(upper_boundary); % Upper boundary
+lower_boundary = struct_2_state(lower_boundary); % Lower boundary
+upper_boundary = struct_2_state(upper_boundary); % Upper boundary
 
 %% Optimization
 % Run optimization
@@ -41,15 +46,31 @@ while tentativa < 1
     tic
     pso;
     execution_time = toc;
-    disp("Elapsed time was " + execution_time + "seconds.")
+    disp("Elapsed time was " + execution_time + " seconds.")
+
+    x = state_2_struct(best_global);
+    if x.t_voo ~= 0
+        result = simulate(x);
+        disp("Minimum error was " + norm(result.error)/ud + " [ud]");
+    else
+        disp("No non-zero best_global evaluated");
+    end
+    
     tentativa = tentativa + 1;
 end
     
-function x = struct_2_boundary(struct)
+function x = struct_2_state(struct)
     x = [
         struct.t_voo, ...
         struct.initial_pos, ...
         struct.target_pos, ...
         struct.v0 ...
     ];
+end
+
+function x = state_2_struct(state)
+    x.t_voo = state(1);
+    x.initial_pos = state(2:4);
+    x.target_pos = state(5:7);
+    x.v0 = state(8:10);
 end

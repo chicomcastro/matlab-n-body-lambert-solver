@@ -30,8 +30,6 @@ end
 
 %% main loop
 while ~check_stopping_condition(iteration, max_iteration)
-    disp(num2str(iteration/max_iteration*100, "%.2f") + "%");
-    iteration = iteration + 1;
     %[particles, best_iteration] = update_particles(particles,...
     %    best_global, hyperparams);
     
@@ -42,6 +40,7 @@ while ~check_stopping_condition(iteration, max_iteration)
     best_iteration = zeros(1,dimension);
     
     for i = 1:length(particles)
+        disp(num2str((iteration/max_iteration + i/num_particles/10)*100, "%.2f") + "%");
         rp = random_uniform(0.0, 1.0);
         rg = random_uniform(0.0, 1.0);
         particles(i).v = w * particles(i).v + ...
@@ -66,6 +65,8 @@ while ~check_stopping_condition(iteration, max_iteration)
     if coust(best_iteration) < coust(best_global)
         best_global = best_iteration;
     end
+    
+    iteration = iteration + 1;
 end
 
 function value = coust(state)
