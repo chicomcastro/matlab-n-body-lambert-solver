@@ -6,12 +6,14 @@
 %COLORING:
 %Specify that the first six colors used will be red, blue, green, black,
 %yellow, and magenta.
-colorMatrix(1:6, 1:3)=[1, 0, 0;
-                       0, 0, 1;
-                       0, 1, 0;
-                       0, 0, 0;
-                       1, 1, 0;
-                       1, 0, 1];
+colorMatrix(1:6, 1:3)=[
+   0, 1, 0;
+   1, 0, 1;
+   1, 0, 0;
+   1, 1, 0;
+   0, 0, 0;
+   0, 0, 1
+];
 %For maore than six bodies the plot will be a mess anyway, but fill in the
 %rest of the colors with the 'hot' command
 colorMatrix(7:N+2, 1:3)=hot((N+2-6));
@@ -53,6 +55,17 @@ end
 
 
 %% PLOTS OF TRAJECTORIES
+theta = [0:pi/180:2*pi];
+earth.x = R_earth_sun.*cos(theta)/ud;
+earth.y = R_earth_sun.*sin(theta)/ud;
+earth.z = theta*0/ud;
+mars.x = R_mars_sun.*cos(theta)/ud;
+mars.y = R_mars_sun.*sin(theta)/ud;
+mars.z = theta*0/ud;
+venus.x = R_venus_sun.*cos(theta)/ud;
+venus.y = R_venus_sun.*sin(theta)/ud;
+venus.z = theta*0/ud;
+
 if exist('y', 'var')
     figure
     hold on
@@ -64,6 +77,9 @@ if exist('y', 'var')
     grid on
     title('The trajectories of the bodies (o is start, * is end)')
     xlabel('x axis'), ylabel('y axis'), zlabel('z axis');
+    plot3(earth.x, earth.y, earth.z, '--', 'Color', 'blue');
+    plot3(mars.x, mars.y, mars.z, '--', 'Color', 'red');
+    plot3(venus.x, venus.y, venus.z, '--', 'Color', 'black');
     axis equal;
 end
 
@@ -80,5 +96,10 @@ if exist('CM1', 'var')
     grid on
     title('The trajectories of the bodies in center of mass coordinates (o is start, * is end)')
     xlabel('x axis'), ylabel('y axis'), zlabel('z axis');
+    plot3(earth.x, earth.y, earth.z, 'Color', 'blue');
+    plot3(mars.x, mars.y, mars.z, 'Color', 'red');
+    plot3(earth.x, earth.y, earth.z, '--', 'Color', 'blue');
+    plot3(mars.x, mars.y, mars.z, '--', 'Color', 'red');
+    plot3(venus.x, venus.y, venus.z, '--', 'Color', 'black');
     axis equal;
 end

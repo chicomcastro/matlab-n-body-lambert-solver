@@ -14,7 +14,7 @@ shouldPlot = 0;
 loadData;
 
 t_voo = 4.8200;   % Simulation time [rad]
-initial_velocity_guess = [36.5891 55.5695 0];	% [km/s]
+initial_velocity_guess = V_hohmann_earth_mars;	% [km/s]
 
 initial_pos = (R_earth_sun * [1 0 0] + altitude_from_earth * [1 0 0]);	% [m]
 target_pos = R_mars_sun * [-1 0 0];     % [m]
@@ -29,12 +29,13 @@ x = initial_state;
 
 %% Main loop
 itr = 1;
-delta = 1e-2;
+delta = .1;
 error = [];
 erro_dist = ones(1,3)*ud;
 disp("Iniciando busca de uma solução...");
 tic
 while norm(erro_dist)/ud > 5e-2
+    
     if mod(itr, 10) == 0
         disp("---");
         disp("Iteração: " + itr);
@@ -80,5 +81,5 @@ toc
 if erro_dist < Inf
     disp("Solução encontrada!");
     disp(x);
-    disp("Custo de saída: " + abs(norm(x.v0) - V_oe_inertial));
+    disp("Custo de saída: " + norm(x.v0 - V_earth_sun*[0,1,0]/1000));
 end

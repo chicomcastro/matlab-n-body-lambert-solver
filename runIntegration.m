@@ -10,7 +10,7 @@ if exist('simulationTime', 'var')
 end
 
 tstart = tic;
-options=odeset('RelTol',1e-12,'AbsTol',1e-12,'Events',@(t,y)myEvent(t,y,tstart));
+options=odeset('RelTol',1e-8,'AbsTol',1e-8,'Events',@(t,y)myEvent(t,y,tstart));
 
 %Integrate the System
 [t,y,te,ye,ie] = ode113(@(t,y)nBodyWpar(t,y,options,flag,N,G,Mass),tspan,y0,options);

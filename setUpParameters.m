@@ -11,5 +11,6 @@ if ~exist("t_voo", "var")
     t_voo = 2*pi;
 end
 
-N = 3;                      % number of bodies
+global N;
+N = 2;                      % number of bodies
 simulationTime = t_voo;     % How long to run the simulation

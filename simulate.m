@@ -8,8 +8,9 @@ function result = simulate(x)
     % Run all subroutines related to simulation
     main;
     
-    r = y(end,7:9);                 % [ud]
-    v = y(end,16:18);               % [ud/ut]
+    global N;
+    r = y(end,3*(N-1)+1:3*(N-1)+3);     % [ud]
+    v = y(end,3*(2*N-1)+1:3*(2*N-1)+3); % [ud/ut]
     
     target = x.target_pos;          % [ud]
     error = r(:)'*ud - target(:)';  % [m] [row vector]
@@ -20,8 +21,8 @@ function result = simulate(x)
         result.error = error;       % [m]
     end
 
-    result.x_t1 = y(1,7:9)*ud;      % [m]
-    result.v_t1 = y(1,16:18)*ud/ut; % [m/s]
+    result.x_t1 = y(1,3*(N-1)+1:3*(N-1)+3)*ud;      % [m]
+    result.v_t1 = y(1,3*(2*N-1)+1:3*(2*N-1)+3)*ud/ut; % [m/s]
     result.x_t2 = r*ud;             % [m]
     result.v_t2 = v*ud/ut;          % [m/s]
 end
