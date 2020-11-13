@@ -12,5 +12,5 @@ if ~exist("t_voo", "var")
 end
 
 global N;
-N = 2;                      % number of bodies
+N = 3;                      % number of bodies
 simulationTime = t_voo;     % How long to run the simulation

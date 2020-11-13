@@ -13,16 +13,14 @@ shouldPlot = 0;
 % Others section can cause problems to change, then it's your risk
 loadData;
 
-t_voo = 4.8200;   % Simulation time [rad]
-initial_velocity_guess = V_hohmann_earth_mars;	% [km/s]
+t_voo = pi;   % Simulation time [ut]
+initial_velocity_guess = V_hohmann_earth_venus;	% [km/s]
 
 initial_pos = (R_earth_sun * [1 0 0] + altitude_from_earth * [1 0 0]);	% [m]
-target_pos = R_mars_sun * [-1 0 0];     % [m]
 
 %% Initial state struct
-initial_state.t_voo = t_voo;                % [rad] (not [s], see normalization.m)
+initial_state.t_voo = t_voo;                % [ut] (not [s], see normalization.m)
 initial_state.initial_pos = initial_pos;    % [m]
-initial_state.target_pos = target_pos;      % [m]
 initial_state.v0 = initial_velocity_guess;  % [km/s]
 
 x = initial_state;
@@ -34,7 +32,7 @@ error = [];
 erro_dist = ones(1,3)*ud;
 disp("Iniciando busca de uma solução...");
 tic
-while norm(erro_dist)/ud > 5e-2
+while norm(erro_dist)/ud > .1
     
     if mod(itr, 10) == 0
         disp("---");

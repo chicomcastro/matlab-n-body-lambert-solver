@@ -6,7 +6,7 @@ G = 1;  % gravitational constant normalized
 
 % Set unit of mass as the sum of all masses involved
 % In this case, it's specificied for Three Body Restricted Problem (3BRP)
-um = M_sun + M_earth;	% [kg]
+um = M_sun + M_venus;	% [kg]
 
 % Set unit of distance as the distance between two mainly bodies
 % In this case, it's specificied for Sun-Earth system

@@ -1,0 +1,21 @@
+7.03446275272934, coust
+5.20896299199078, mars phase
+2.14795059794092, venus phase
+108.531513519344, earth-venus t_voo
+212.335011913553, venus-mars t_voo
+
+
+0.015,
+100,
+100,
+19.5129466
+
+
+Velocidade de saída da Terra: 26.6815
+    -0.052512       26.681            0
+
+Velocidade de chegada 1: 37.292
+      -27.922       -24.72            0
+	
+Custos: 
+       3.6558   1.1959e-05       3.3787
