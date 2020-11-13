@@ -9,24 +9,35 @@ loadData;
 
 %% Earth-Venus
 % From 2B optim
+V_sai_terra = [-0.052512, 26.681, 0];    % [km/s]
 earth_venus_transfer = fly(...
     108.531513519344*24*60*60/ut, ... % Flight time Mars-Venus [ut]
     (R_earth_sun * [1 0 0] * Rz(0)), ...    % Departure from Earth [m]
-    [-0.052512, 26.681, 0]... % Velocity to reach Mars orbit from Earth [km/s]
+    V_sai_terra... % Velocity to reach Mars orbit from Earth [km/s]
 );
+V_inicial = V_earth_sun * [0,1,0]/1000;    % [km/s]
+delta_v_saida_terra = norm(V_sai_terra - V_inicial);    % [km/s]
+
 % TODO simular até cruzar a órbita de Vênus para refinar t_voo e x_t2
 
 %% Venus swing by
 % From 2B
 % entro no swing_by com uma velocidade vinda da análise 2B
-v_entra_swing_by = [-27.9215017466389,-24.7200847282275,0]; % [km/s]
+%v_entra_swing_by = [-27.9215017466389,-24.7200847282275,0]; % [km/s]
+v_entra_swing_by = earth_venus_transfer.v_t2/1000; % [km/s]
 % TODO pegar a velocidade do fim do estágio anterior
+
+% Can be anything sufficiently big to finish 1 non-propulsed swing by
+t_voo = 0.1;    % [ut]
 
 % To optimize
 theta_soi_venus = 1.8102;   % [rad]
-t_voo = 0.1;    % [ut]
+fracao_impulso = 0.5;
+magnitude_impulso = -1;
 
 % Simula o swing by
+% Avaliação do swing by
+shouldPlot = 0;
 venus_pos = R_venus_sun * [1,0,0] * Rz(2.14795059794092);   % from 2B [m]
 spaceship_pos = venus_pos + SOI_venus * [1,0,0] * Rz(theta_soi_venus); % [m]
 venus_swing_by = swing_by(...
@@ -35,12 +46,30 @@ venus_swing_by = swing_by(...
     v_entra_swing_by,... % Velocity entering Venus SOI  [km/s]
     venus_pos...         % Venus position when spaceship entersits SOI [m]
 );
+t_swing_by = venus_swing_by.t(end); % [ut]
+shouldPlot = 1;
 
-error = (norm(venus_swing_by.error) - SOI_venus)/ud;
-disp(error);
+% Pré-impulso
+venus_swing_by_pre = swing_by(...
+    t_swing_by*fracao_impulso, ...           % Simulation time (independant, it will stop when leaves SOI) [ut]
+    spaceship_pos, ...   % Swing by start position [m]
+    v_entra_swing_by,... % Velocity entering Venus SOI  [km/s]
+    venus_pos...         % Venus position when spaceship entersits SOI [m]
+);
 
-v_sai_swing_by = [-34.5525509338481,-21.7509589497666,0];
-delta_v_swing_by = norm(v_sai_swing_by - venus_swing_by.v_t2/1000);
+% Pós-impulso
+v_pre_impulso = venus_swing_by_pre.v_t2/1000;
+v_pos_impulso = v_pre_impulso + magnitude_impulso * v_pre_impulso/norm(v_pre_impulso);
+venus_swing_by_pos = swing_by(...
+    t_swing_by*(1-fracao_impulso), ...           % Simulation time (independant, it will stop when leaves SOI) [ut]
+    venus_swing_by_pre.x_t2, ...   % Swing by start position [m]
+    v_pos_impulso,...    % Velocity entering Venus SOI  [km/s]
+    venus_swing_by_pre.target_x...         % Venus position when spaceship entersits SOI [m]
+);
+
+v_sai_swing_by = [-34.5525509338481,-21.7509589497666,0];    % [km/s]
+% v_sai_swing_by = venus_swing_by.v_t2/1000;    % [km/s]
+delta_v_swing_by = norm(v_sai_swing_by - venus_swing_by_pos.v_t2/1000);    % [km/s]
 
 %% Venus-Mars
 % From 2B optim
@@ -64,6 +93,13 @@ venus_mars_transfer = fly(...
     venus_swing_by.target_x... % Venus phase after swing-by
 );
 
+tangent_direction = cross([0,0,1], venus_mars_transfer.x_t2(:)')/norm(cross([0,0,1], venus_mars_transfer.x_t2(:)'));
+V_final = V_mars_sun * tangent_direction;    % [m/s]
+delta_v_chegada = norm(venus_mars_transfer.v_t2 - V_final)/1000;    % [km/s]
+
+%%
+delta_v_total = delta_v_saida_terra + delta_v_swing_by + delta_v_chegada;
+
 %%
 function result = fly(t_voo, initial_pos, initial_velocity_guess, venus_initial_pos)
     initial_state.t_voo = t_voo;                % [ut] (not [s], see normalization.m)
@@ -79,7 +115,7 @@ function result = fly(t_voo, initial_pos, initial_velocity_guess, venus_initial_
     result = simulate(x);
 end
 
-function result = swing_by(t_voo, initial_pos, initial_velocity_guess, venus_initial_pos)    
+function result = swing_by(t_voo, initial_pos, initial_velocity_guess, venus_initial_pos, impulse_fraction)    
     V_exit_earth = initial_velocity_guess;            % [km/s]
     
     if nargin <= 3
@@ -130,6 +166,8 @@ function result = swing_by(t_voo, initial_pos, initial_velocity_guess, venus_ini
     % Target state
     result.target_x = target*ud;      % [m]
     result.target_v = y(end,3*(2*N-2)+1:3*(2*N-2)+3)*ud/ut;      % [m/s]
+    
+    result.t = t(1:i-1);
 end
 
 function delta_v_swing_by = perform_swing_by(theta_entrada)
