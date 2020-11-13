@@ -15,7 +15,7 @@ if ~exist("venus_initial_pos", "var")
     theta_venus_f = 2.14795059794092;   % From 2B optim
     omega_venus_sun = norm([0,0,3.236706097374289e-07])*ut; % [rad/ut]
     theta_venus_i = theta_venus_f - omega_venus_sun * t_voo;
-    venus_initial_pos = SOI_venus * [1,0,0] * Rz(theta_venus_i);
+    venus_initial_pos = R_venus_sun * [1,0,0] * Rz(theta_venus_i);
 end
 r2 = venus_initial_pos/ud;  % [ud]
 tangent_direction = cross([0,0,1], r2(:)')/norm(cross([0,0,1], r2(:)'));

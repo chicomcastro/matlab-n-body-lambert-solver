@@ -10,7 +10,7 @@ loadData;
 %% Earth-Venus
 % From 2B optim
 earth_venus_transfer = fly(...
-    108.9*24*60*60/ut, ... % Flight time Mars-Venus [ut]
+    108.531513519344*24*60*60/ut, ... % Flight time Mars-Venus [ut]
     (R_earth_sun * [1 0 0] * Rz(0)), ...    % Departure from Earth [m]
     [-0.052512, 26.681, 0]... % Velocity to reach Mars orbit from Earth [km/s]
 );
@@ -59,19 +59,11 @@ venus_mars_transfer = fly(...
 % velocidade pra poder chegar em Marte
 venus_mars_transfer = fly(...
     212.335011913553*24*60*60/ut, ... % Flight time Mars-Venus [ut]
-    earth_venus_transfer.x_t2, ...    % Departure from Venus [m]
-    [-34.5525509338481,-21.7509589497666,0],... % Velocity to reach Mars orbit from Venus [km/s]
+    venus_swing_by.x_t2, ...    % Departure from Venus [m]
+    [-34.5025509338481,-21.7509589497666,0],... % Velocity to reach Mars orbit from Venus [km/s]
     venus_swing_by.target_x... % Venus phase after swing-by
 );
 
-%%
-shouldPlot = 0;
-fun = @(x) perform_swing_by(x(1));
-x0 = [pi/2];
-options = optimset('MaxIter',1e4, 'MaxFunEvals', 1e4, 'TolFun', 1e-8, 'TolX', 1e-8);
-x = fminsearch(fun,x0, options);
-disp(x);
-shouldPlot = 1;
 %%
 function result = fly(t_voo, initial_pos, initial_velocity_guess, venus_initial_pos)
     initial_state.t_voo = t_voo;                % [ut] (not [s], see normalization.m)
@@ -161,4 +153,16 @@ function delta_v_swing_by = perform_swing_by(theta_entrada)
     else
         delta_v_swing_by = norm(v_sai_swing_by - venus_swing_by.v_t2/1000);
     end
+end
+
+function x = optimize_swing_by()
+    global shouldPlot;
+    shouldPlot = 0;
+    fun = @(x) perform_swing_by(x(1));
+    x0 = [pi/2];
+    options = optimset('MaxIter',1e4, 'MaxFunEvals', 1e4, 'TolFun', 1e-8, 'TolX', 1e-8);
+    x = fminsearch(fun,x0, options);
+    disp(x);
+    disp(fun(x));
+    shouldPlot = 1;
 end

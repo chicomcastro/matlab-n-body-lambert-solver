@@ -10,7 +10,7 @@ function result = simulate(x)
         theta_venus_f = 2.14795059794092;   % From 2B optim
         omega_venus_sun = norm([0,0,3.236706097374289e-07])*ut; % [rad/ut]
         theta_venus_i = theta_venus_f - omega_venus_sun * t_voo;
-        venus_initial_pos = SOI_venus * [1,0,0] * Rz(theta_venus_i);
+        venus_initial_pos = R_venus_sun * [1,0,0] * Rz(theta_venus_i);
     else
         venus_initial_pos = x.venus_initial_pos;
     end
