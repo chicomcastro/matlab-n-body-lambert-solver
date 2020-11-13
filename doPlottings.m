@@ -18,9 +18,6 @@ colorMatrix(1:6, 1:3)=[
 %rest of the colors with the 'hot' command
 colorMatrix(7:N+2, 1:3)=hot((N+2-6));
 
-%% Calculating observables
-calculateIntegralsOfMotion;
-
 %% Plotting observables
 if exist('I5', 'var')
     plot(t(1:timeMax),I5(1:timeMax))

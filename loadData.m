@@ -22,8 +22,13 @@ R_earth_sun = 1*UA;
 R_mars_sun = 2.2794e11; % m
 R_venus_sun = 1.08e11; %m
 
+% Radius
+R_earth = 6.371e6; % [m]
+R_mars = 3.3895e6; % [m]
+
 % Altitude of parking orbit before exit Earth
 altitude_from_earth = 400e3;   % m
+altitude_from_mars = 400e3;    % m
 
 % Planets orbital velocities
 V_earth_sun = sqrt(G_metric*M_sun/R_earth_sun);             % [m/s]
@@ -31,7 +36,8 @@ V_venus_sun = sqrt(G_metric*M_sun/R_venus_sun);             % [m/s]
 V_mars_sun = sqrt(G_metric*M_sun/R_mars_sun);             % [m/s]
 
 % Parking orbit from Earth
-V_oe_earth = sqrt(G_metric*M_earth/altitude_from_earth);    % [m/s]
+V_oe_earth = sqrt(G_metric*M_earth/(altitude_from_earth + R_earth));    % [m/s]
+V_oe_mars = sqrt(G_metric*M_mars/(altitude_from_mars + R_mars));    % [m/s]
 V_oe_inertial = V_oe_earth + V_earth_sun;                   % [m/s]
 V_oe_inertial = V_oe_inertial/1e3;                          % [km/s]
 
