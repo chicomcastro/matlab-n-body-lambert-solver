@@ -1,10 +1,14 @@
 %% script bla
-
-clear;
+% inputs:
+% V_sai_terra = [-5.1129, 27.293, 0] [km/s]
+% theta_venus = 3.1405 [rad]
+% theta_soi_venus [rad]
+% fracao_impulso
+% magnitude_impulso [km/s]
 
 % Do not change this (see showResults.m)
 global shouldPlot;
-shouldPlot = 1;
+shouldPlot = 0;
 loadData;
 
 %% Earth-Venus
@@ -36,8 +40,12 @@ t_voo = 0.1;    % [ut]
 
 % To optimize
 theta_soi_venus = 0.52135;   % [rad]
-fracao_impulso = 0.99;
-magnitude_impulso = 0.4;
+if ~exist('fracao_impulso', 'var')
+    fracao_impulso = 0.05;
+end
+if ~exist('magnitude_impulso', 'var')
+    magnitude_impulso = 0.05;
+end
 
 % Simula o swing by
 % Avaliação do swing by
@@ -99,17 +107,22 @@ venus_mars_transfer = fly(...
 %%
 tangent_direction = cross([0,0,1], venus_mars_transfer.x_t2(:)')/norm(cross([0,0,1], venus_mars_transfer.x_t2(:)'));
 V_final = V_mars_sun * tangent_direction;    % [m/s]
-delta_v_chegada = norm(venus_mars_transfer.v_t2 - V_final)/1000;    % [km/s]
+delta_v_chegada_marte = norm(venus_mars_transfer.v_t2 - V_final)/1000;    % [km/s]
 
 v_inf = norm(venus_mars_transfer.v_t2) - V_mars_sun;
 v_chegada = sqrt(norm(v_inf)^2 + 2*G_metric*M_mars/(altitude_from_mars + R_mars));
-delta_v_chegada_marte_2B = norm(V_oe_mars - v_chegada);   % delta V de saída por 2B [km/s]
+delta_v_chegada_marte_2B = norm(V_oe_mars - v_chegada)/1000;   % delta V de saída por 2B [km/s]
+
+if venus_mars_transfer.error > 0.01
+    delta_v_chegada_marte = NaN;
+    delta_v_chegada_marte_2B = NaN; 
+end
 
 %%
 delta_v = [...
     delta_v_saida_terra;...
     delta_v_swing_by;...
-    delta_v_chegada...
+    delta_v_chegada_marte...
 ];
 delta_v_2B = [...
     delta_v_saida_terra_2B;...
