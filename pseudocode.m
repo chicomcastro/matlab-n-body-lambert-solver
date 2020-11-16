@@ -41,10 +41,10 @@ t_voo = 0.1;    % [ut]
 % To optimize
 theta_soi_venus = 0.52135;   % [rad]
 if ~exist('fracao_impulso', 'var')
-    fracao_impulso = 0.05;
+    fracao_impulso = 0.512;
 end
 if ~exist('magnitude_impulso', 'var')
-    magnitude_impulso = 0.05;
+    magnitude_impulso = 0.85;
 end
 
 % Simula o swing by

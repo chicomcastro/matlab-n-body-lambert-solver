@@ -1,25 +1,23 @@
 
 % i
-passo_fracao = 0.001;
+passo_fracao = 0.01;
 n = length(passo_fracao:passo_fracao:(1-passo_fracao));
 
 % j
 passo_magnitude = 0.001;
 m = length(0:passo_magnitude:2);
 
-data = zeros(0,3);
-custo = NaN(n,m);
+custo2 = NaN(m,n);
 
 clear fracao_impulso magnitude_impulso;
 tic
-for i=1:n
-    fracao_impulso=i*passo_fracao;
-    disp(i/n*100 + "%");
-    for j=1:m
-        magnitude_impulso=(j-1)*passo_magnitude;
+for j=1:m
+    disp(j/m*100 + "%");
+    magnitude_impulso=(j-1)*passo_magnitude;
+    for i=1:n
+        fracao_impulso=i*passo_fracao;
         pseudocode;
-        data(end+1,:) = [fracao_impulso, magnitude_impulso, delta_v_total_2B];
-        custo(i,j) = delta_v_total_2B;
+        custo2(j,i) = delta_v_total_2B;
     end
 end
 toc
@@ -28,7 +26,9 @@ figure;
 y = passo_fracao:passo_fracao:(1-passo_fracao);
 x = 0:passo_magnitude:2;
 [X, Y] = meshgrid(x, y);
-Z = custo;
+Z = custo2(1:m,1:n)';
+f = @(x) x > 10;
+Z(f(Z)) = NaN;
 contourf(X, Y, Z);
 pcolor(X, Y, Z);
 shading interp
@@ -38,6 +38,7 @@ xlabel("Magnitude do empuxo [km/s]");
 colorbar
 
 %%
+clear min;
 min.coust = min(custo(:));
 for i_=1:size(custo,1)
     for j_=1:size(custo,2)
