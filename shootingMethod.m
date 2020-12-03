@@ -30,9 +30,10 @@ itr = 1;
 delta = .1;
 error = [];
 erro_dist = ones(1,3)*ud;
+tolerance = .1;
 disp("Iniciando busca de uma solução...");
 tic
-while norm(erro_dist)/ud > .1
+while norm(erro_dist)/ud > tolerance
     
     if mod(itr, 10) == 0
         disp("---");
@@ -76,8 +77,25 @@ while norm(erro_dist)/ud > .1
     end
 end
 toc
+%%
 if erro_dist < Inf
     disp("Solução encontrada!");
     disp(x);
-    disp("Custo de saída: " + norm(x.v0 - V_earth_sun*[0,1,0]/1000));
+    disp("Custo de saída: " + norm(x.v0 - V_earth_sun*[0,1,0]/1000) + " km/s");
+    
+    V_sai_terra = x.v0;
+    v_inf = (V_sai_terra*1000 - V_earth_sun*[0,1,0]);   % V_saida em relação à Terra[m/s]
+    v_saida = sqrt(norm(v_inf)^2 + 2*G_metric*M_earth/(altitude_from_earth + R_earth)); % V_p que vai dar V_inf na saída hiperbólica
+    delta_v_saida_terra_2B = norm(v_saida - V_oe_earth)/1000;   % delta V de saída por 2B [km/s]
+    disp("Custo de saída 2B: " + delta_v_saida_terra_2B + " km/s");
+    
+    shouldPlot = 1;
+    simulate(x);
+    shouldPlot = 0;
+    fig_title = replace(...
+        "t-"+x.t_voo+"-v0-"+x.v0(1)+"-"+x.v0(2)+"-tol-"+tolerance,...
+        '.',...
+        'd'...
+    );
+    saveas(gcf,fig_title+".png")
 end
