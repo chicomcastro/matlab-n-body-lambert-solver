@@ -25,6 +25,7 @@ R_venus_sun = 1.08e11; %m
 % Radius
 R_earth = 6.371e6; % [m]
 R_mars = 3.3895e6; % [m]
+R_venus = 6.0518e6;% [m]
 
 % Altitude of parking orbit before exit Earth
 altitude_from_earth = 400e3;   % m

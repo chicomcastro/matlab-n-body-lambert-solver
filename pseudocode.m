@@ -22,7 +22,7 @@ earth_venus_transfer = fly(...
 V_inicial = V_earth_sun * [0,1,0]/1000;    % [km/s]
 delta_v_saida_terra = norm(V_sai_terra - V_inicial);    % [km/s]
 
-v_inf = norm(V_sai_terra*1000 - V_earth_sun*[0,1,0]);   % V_saida em relação à Terra[m/s]
+v_inf = (V_sai_terra*1000 - V_earth_sun*[0,1,0]);   % V_saida em relação à Terra[m/s]
 v_saida = sqrt(norm(v_inf)^2 + 2*G_metric*M_earth/(altitude_from_earth + R_earth)); % V_p que vai dar V_inf na saída hiperbólica
 delta_v_saida_terra_2B = norm(v_saida - V_oe_earth)/1000;   % delta V de saída por 2B [km/s]
 
@@ -41,10 +41,12 @@ t_voo = 0.1;    % [ut]
 % To optimize
 theta_soi_venus = 0.52135;   % [rad]
 if ~exist('fracao_impulso', 'var')
-    fracao_impulso = 0.512;
+    fracao_impulso = 0.5068;    % custo minimo encontrado
+    %fracao_impulso = 0.005;     % mínimo para chegar em Marte
 end
 if ~exist('magnitude_impulso', 'var')
-    magnitude_impulso = 0.85;
+    magnitude_impulso = 0.85;  % custo mínimo encontrado
+    %magnitude_impulso = 0.045;   % minimo para chegar em Marte
 end
 
 % Simula o swing by
@@ -105,7 +107,8 @@ venus_mars_transfer = fly(...
 %);
 
 %%
-tangent_direction = cross([0,0,1], venus_mars_transfer.x_t2(:)')/norm(cross([0,0,1], venus_mars_transfer.x_t2(:)'));
+radius_direction = venus_mars_transfer.x_t2(:)'/norm(venus_mars_transfer.x_t2(:)');
+tangent_direction = cross([0,0,1], radius_direction);
 V_final = V_mars_sun * tangent_direction;    % [m/s]
 delta_v_chegada_marte = norm(venus_mars_transfer.v_t2 - V_final)/1000;    % [km/s]
 
@@ -131,6 +134,77 @@ delta_v_2B = [...
 ];
 delta_v_total = sum(delta_v);
 delta_v_total_2B = sum(delta_v_2B);
+
+%%
+t_voo = [...
+    earth_venus_transfer.t(end),...
+    venus_swing_by_pre.t(end),...
+    venus_swing_by_pos.t(end),...
+    venus_mars_transfer.t(end)...
+];
+
+t_voo_total = sum(t_voo)/2/pi*365;      % [dias]
+
+r_p = min(venus_swing_by_pre.r_p, venus_swing_by_pos.r_p)*ud/R_venus;    % [raios de Vênus]
+
+mars_final_phase = atan(radius_direction(2)/radius_direction(1))*180/pi;
+
+%%
+trajetoria = [...
+    earth_venus_transfer.x;...
+    venus_swing_by_pre.x;...
+    venus_swing_by_pos.x;...
+    venus_mars_transfer.x...
+];
+
+figure;
+hold on
+color = [0.5, 0.5, 0];
+plot3(trajetoria(:, 1), trajetoria(:, 2), trajetoria(:, 3), 'Color', color);
+plot3(trajetoria(1, 1), trajetoria(1, 2), trajetoria(1, 3), 'o', 'Color', color);
+plot3(trajetoria(end, 1), trajetoria(end, 2), trajetoria(end, 3), '*', 'Color', color);
+grid on
+title('Trajetória da espaçonave')
+xlabel('x [ud]'), ylabel('y [ud]'), zlabel('z [ud]');
+
+theta = [0:pi/180:2*pi];
+earth.x = R_earth_sun.*cos(theta)/ud;
+earth.y = R_earth_sun.*sin(theta)/ud;
+earth.z = theta*0/ud;
+mars.x = R_mars_sun.*cos(theta)/ud;
+mars.y = R_mars_sun.*sin(theta)/ud;
+mars.z = theta*0/ud;
+venus.x = R_venus_sun.*cos(theta)/ud;
+venus.y = R_venus_sun.*sin(theta)/ud;
+venus.z = theta*0/ud;
+plot3(earth.x, earth.y, earth.z, '--', 'Color', 'blue');
+plot3(mars.x, mars.y, mars.z, '--', 'Color', 'red');
+plot3(venus.x, venus.y, venus.z, '--', 'Color', 'black');
+axis equal;
+legend('Trajetória', 'Ponto de partida', 'Ponto de chegada', 'Órbita da Terra', 'Órbita de Marte', 'Órbita de Vênus', 'Location', 'southoutside');
+
+%%
+distancia_venus = [...
+    venus_swing_by_pre.r_SC_venus;...
+    venus_swing_by_pos.r_SC_venus...
+]*ud/R_venus;
+
+tempo_swing_by = [...
+    venus_swing_by_pre.t;...
+    venus_swing_by_pre.t(end) + venus_swing_by_pos.t...
+]/t_swing_by;
+
+figure;
+plot(tempo_swing_by, distancia_venus);
+xlabel('Fração do swing by');
+ylabel('Distância [raios de Vênus]');
+title('Distância da espaçonave em relação a Vênus durante swing by');
+grid on;
+hold on;
+plot(fracao_impulso*ones(1,round(max(distancia_venus))),[1:round(max(distancia_venus))]);
+[~, min_index] = min(distancia_venus);
+plot(tempo_swing_by(min_index)*ones(1,round(max(distancia_venus))),[1:round(max(distancia_venus))]);
+legend('Distância a Vênus', 'Momento do impulso', 'Periapsis');
 
 %%
 function result = fly(t_voo, initial_pos, initial_velocity_guess, venus_initial_pos)    
@@ -186,7 +260,10 @@ function result = fly(t_voo, initial_pos, initial_velocity_guess, venus_initial_
     result.target_x = target*ud;      % [m]
     result.target_v = y(end,3*(2*N-2)+1:3*(2*N-2)+3)*ud/ut;      % [m/s]
     
-    result.t = t;
+    % Spaceship trajectory
+    result.t = t;      % [ut]
+    result.x = y(:,3*(N-1)+1:3*(N-1)+3);      % [ud]
+    result.v = y(:,3*(2*N-1)+1:3*(2*N-1)+3);  % [ud/ut]
 end
 
 function result = swing_by(t_voo, initial_pos, initial_velocity_guess, venus_initial_pos, impulse_fraction)    
@@ -238,10 +315,16 @@ function result = swing_by(t_voo, initial_pos, initial_velocity_guess, venus_ini
     result.v_t2 = v*ud/ut;          % [m/s]
     
     % Target state
-    result.target_x = target*ud;      % [m]
+    result.target_x = target*ud;    % [m]
     result.target_v = y(end,3*(2*N-2)+1:3*(2*N-2)+3)*ud/ut;      % [m/s]
     
-    result.t = t(1:i-1);
+    result.r_p = min(vecnorm(distance')');   % [ud]
+    result.r_SC_venus = vecnorm(distance(1:i-1, :)')';
+    
+    % Spaceship trajectory
+    result.t = t(1:i-1);            % [ut]
+    result.x = y(1:i-1,3*(N-1)+1:3*(N-1)+3);      % [ud]
+    result.v = y(1:i-1,3*(2*N-1)+1:3*(2*N-1)+3);  % [ud/ut]
 end
 
 function delta_v_swing_by = perform_swing_by(theta_entrada)
